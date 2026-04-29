@@ -30,7 +30,7 @@ export default function BeginningSection() {
             ease: 'power2.out',
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: 'top 60%',
+              start: 'top 95%',
               toggleActions: 'play none none none',
             },
             delay: i * 0.15

@@ -11,6 +11,7 @@ export default function EnvelopeSection({ onComplete }: EnvelopeSectionProps) {
   const flapRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const scrollHintRef = useRef<HTMLDivElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
 
   useEffect(() => {
@@ -20,16 +21,12 @@ export default function EnvelopeSection({ onComplete }: EnvelopeSectionProps) {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => {
-          // Collapse the section so it doesn't leave empty scroll space
-          gsap.to(sectionRef.current, {
-            height: 0,
-            minHeight: 0,
-            duration: 0.01,
-            onComplete: () => {
-              window.scrollTo(0, 0);
-              onComplete();
-            }
-          });
+          // Show scroll hint after envelope animation
+          gsap.fromTo(scrollHintRef.current,
+            { opacity: 0, y: -10 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
+          );
+          onComplete();
         }
       });
 
@@ -59,8 +56,8 @@ export default function EnvelopeSection({ onComplete }: EnvelopeSectionProps) {
         { y: -60, opacity: 1, scaleY: 1, duration: 0.8, ease: 'power3.out' }
       );
 
-      // Envelope and paper fade out
-      tl.to([envelopeRef.current, paperRef.current, textRef.current], {
+      // Envelope and paper fade out, but keep text
+      tl.to([envelopeRef.current, paperRef.current], {
         opacity: 0,
         y: -40,
         duration: 0.6,
@@ -70,7 +67,8 @@ export default function EnvelopeSection({ onComplete }: EnvelopeSectionProps) {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [hasPlayed, onComplete]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section
@@ -170,6 +168,33 @@ export default function EnvelopeSection({ onComplete }: EnvelopeSectionProps) {
         style={{ color: '#C45C6A', opacity: 0 }}
       >
         A letter for you...
+      </div>
+
+      {/* Scroll down hint */}
+      <div
+        ref={scrollHintRef}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        style={{ opacity: 0 }}
+      >
+        <span className="font-handwritten text-lg" style={{ color: '#C45C6A', opacity: 0.7 }}>
+          scroll down
+        </span>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          className="animate-gentle-bounce"
+          style={{ opacity: 0.7 }}
+        >
+          <path
+            d="M12 5v14M5 12l7 7 7-7"
+            stroke="#C45C6A"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </div>
     </section>
   );
