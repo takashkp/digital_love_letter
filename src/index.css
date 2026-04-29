@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 33% 93%;
+    --foreground: 28 39% 17%;
+    --card: 40 33% 93%;
+    --card-foreground: 28 39% 17%;
+    --popover: 40 33% 93%;
+    --popover-foreground: 28 39% 17%;
+    --primary: 350 48% 63%;
+    --primary-foreground: 28 39% 17%;
+    --secondary: 40 30% 88%;
+    --secondary-foreground: 28 39% 17%;
+    --muted: 40 20% 88%;
+    --muted-foreground: 28 20% 40%;
+    --accent: 350 48% 63%;
+    --accent-foreground: 28 39% 17%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 35 25% 80%;
+    --input: 35 25% 80%;
+    --ring: 350 48% 63%;
+    --radius: 0.625rem;
+
+    --color-cream: #F5F0E6;
+    --color-coffee: #3D2C1D;
+    --color-rose: #C45C6A;
+    --color-pink-soft: #E8A0B0;
+    --color-pink-deep: #D4607A;
+    --color-polaroid: #FAFAF5;
+    --color-envelope: #E8D5C0;
+    --color-envelope-dark: #C9A87C;
+    --color-gray-no: #9E9E9E;
+    --color-gray-dark: #6B6B6B;
+    --color-confetti-1: #E8A0B0;
+    --color-confetti-2: #D4607A;
+    --color-confetti-3: #F0C4A0;
+    --color-confetti-4: #D4A574;
+  }
+
+  body {
+    font-family: 'Caveat', cursive;
+    background-color: var(--color-cream);
+    color: var(--color-coffee);
+    overflow-x: hidden;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .font-handwritten {
+    font-family: 'Caveat', cursive;
+  }
+
+  .font-ui {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .paper-texture {
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(120, 80, 40, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(120, 80, 40, 0.02) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(120, 80, 40, 0.02) 0%, transparent 50%);
+  }
+
+  .text-shadow-paper {
+    text-shadow: 0 2px 12px rgba(245, 240, 230, 0.8);
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1.3); }
+  50% { transform: scale(1.35); }
+}
+
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+}
+
+@keyframes sparkle-float {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  50% { opacity: 1; transform: translateY(-20px) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
+}
+
+@keyframes heart-rise {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh) translateX(var(--drift)) scale(0.5) rotate(var(--rot));
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) translateX(var(--drift)) rotate(var(--rot));
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(228, 160, 176, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(228, 160, 176, 0.6); }
+}
+
+@keyframes flash-white {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.2s infinite ease-in-out;
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 1s infinite ease-in-out;
+}
+
+.animate-shake {
+  animation: shake 0.1s infinite linear;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 1.5s infinite ease-in-out;
+}
+
+.animate-flash-white {
+  animation: flash-white 0.3s ease-in-out;
+}
