@@ -137,7 +137,7 @@ export default function FirstPhotoSection() {
             }}
           >
             <img
-              src="/images/couple-first-meet.jpg"
+              src={`${import.meta.env.BASE_URL}images/couple-first-meet.jpg`}
               alt="First meeting"
               className="w-full h-[320px] object-cover"
               style={{ filter: 'saturate(0.9)' }}

@@ -179,7 +179,7 @@ export default function SecondPhotoSection() {
             >
               <img
                 ref={photoRef}
-                src="/images/couple-milestone-trip.jpg"
+                src={`${import.meta.env.BASE_URL}images/couple-milestone-trip.jpg`}
                 alt="Milestone trip"
                 className="w-full h-auto object-cover"
                 style={{

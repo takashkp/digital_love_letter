@@ -140,7 +140,7 @@ export default function Celebration({ visible }: CelebrationProps) {
       {/* Big photo */}
       <img
         ref={photoRef}
-        src="/images/couple-celebration.jpg"
+        src={`${import.meta.env.BASE_URL}images/couple-celebration.jpg`}
         alt="Celebration"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ opacity: 0, zIndex: 1 }}

@@ -116,7 +116,7 @@ export default function TheNowSection() {
       >
         <img
           ref={photoRef}
-          src="/images/couple-now.jpg"
+          src={`${import.meta.env.BASE_URL}images/couple-now.jpg`}
           alt="Now"
           className="w-[280px] sm:w-[400px] h-auto object-cover"
           style={{

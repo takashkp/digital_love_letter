@@ -82,7 +82,7 @@ export default function MiddleSection() {
         ref={bgRef}
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'url(/images/couple-first-meet.jpg)',
+          backgroundImage: `url(${import.meta.env.BASE_URL}images/couple-first-meet.jpg)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 0.3,
