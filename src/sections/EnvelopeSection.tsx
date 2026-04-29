@@ -20,7 +20,16 @@ export default function EnvelopeSection({ onComplete }: EnvelopeSectionProps) {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => {
-          setTimeout(onComplete, 500);
+          // Collapse the section so it doesn't leave empty scroll space
+          gsap.to(sectionRef.current, {
+            height: 0,
+            minHeight: 0,
+            duration: 0.01,
+            onComplete: () => {
+              window.scrollTo(0, 0);
+              onComplete();
+            }
+          });
         }
       });
 
