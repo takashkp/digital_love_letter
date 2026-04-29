@@ -11,6 +11,8 @@ const questionLines = [
   { text: 'for another year?', size: 'text-4xl sm:text-5xl', accent: true },
 ];
 
+const noTexts = ['No', 'Really?', 'Think again!', 'Please?', 'I\'m begging...', '...'];
+
 interface QuestionSectionProps {
   onYesClick: () => void;
 }
@@ -19,20 +21,11 @@ export default function QuestionSection({ onYesClick }: QuestionSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const linesRef = useRef<(HTMLDivElement | null)[]>([]);
   const yesButtonRef = useRef<HTMLButtonElement>(null);
-  const noButtonRef = useRef<HTMLButtonElement>(null);
-  const noWrapperRef = useRef<HTMLDivElement>(null);
-  const sparklesRef = useRef<HTMLDivElement>(null);
-  const sweatRef = useRef<HTMLDivElement>(null);
-  const tearRef = useRef<HTMLDivElement>(null);
 
   const [phase, setPhase] = useState(0);
-  const [noText, setNoText] = useState('No');
   const [yesText, setYesText] = useState('Yes');
   const [showButtons, setShowButtons] = useState(false);
-  const [noPopup, setNoPopup] = useState(false);
-
-  const phaseRef = useRef(phase);
-  phaseRef.current = phase;
+  const [noVisible, setNoVisible] = useState(true);
 
   // Text lines reveal
   useEffect(() => {
@@ -56,122 +49,28 @@ export default function QuestionSection({ onYesClick }: QuestionSectionProps) {
         );
       });
 
-      // Show buttons after text
       gsap.delayedCall(1.2, () => setShowButtons(true));
     }, sectionRef);
 
     return () => ctx.revert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Phase change effects
+  // Yes button grows with each phase
   useEffect(() => {
-    if (phase === 1) {
-      setNoText('Really?');
-      gsap.to(noButtonRef.current, {
-        x: 50,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      gsap.to(yesButtonRef.current, {
-        scale: 1.1,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-    } else if (phase === 2) {
-      setNoText('Think again!');
-      // Teleport to random position
-      const safeX = 60 + Math.random() * (window.innerWidth - 200);
-      const safeY = 60 + Math.random() * (window.innerHeight - 150);
-      if (noWrapperRef.current) {
-        gsap.set(noWrapperRef.current, {
-          position: 'fixed',
-          left: safeX,
-          top: safeY,
-          rotate: 15
-        });
-      }
-      gsap.to(yesButtonRef.current, {
-        scale: 1.3,
-        backgroundColor: '#D4607A',
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      // Show sweat
-      gsap.to(sweatRef.current, { opacity: 1, duration: 0.3 });
-    } else if (phase === 3) {
-      setNoText('Please?');
-      gsap.to(noButtonRef.current, {
-        scale: 0.7,
-        opacity: 0.6,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      gsap.to(yesButtonRef.current, {
-        scale: 1.6,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      // Show sparkles
-      gsap.to(sparklesRef.current, { opacity: 1, duration: 0.3 });
-    } else if (phase === 4) {
-      setNoText('I\'m begging...');
-      gsap.to(noButtonRef.current, {
-        scale: 0.4,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      gsap.to(yesButtonRef.current, {
-        scale: 2,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      // Show tears
-      gsap.to(tearRef.current, { opacity: 0.7, duration: 0.3 });
-    } else if (phase === 5) {
-      setNoText('...');
-      gsap.to(noButtonRef.current, {
-        scale: 0.1,
-        duration: 0.5,
-        ease: 'power2.out'
-      });
-      // Flee to corner
-      if (noWrapperRef.current) {
-        gsap.to(noWrapperRef.current, {
-          left: 40,
-          top: window.innerHeight - 80,
-          duration: 0.5,
-          ease: 'power2.out'
-        });
-      }
-      // Yes expands
-      gsap.to(yesButtonRef.current, {
-        scale: 1,
-        width: 'min(500px, 80vw)',
-        height: '100px',
-        duration: 0.5,
-        ease: 'power2.out'
-      });
+    if (!yesButtonRef.current) return;
+
+    if (phase >= 5) {
       setYesText('YES!');
+      setNoVisible(false);
     }
   }, [phase]);
 
-  const handleNoHover = useCallback(() => {
-    if (phaseRef.current >= 5) return;
+  const handleNoClick = useCallback(() => {
     setPhase(prev => Math.min(prev + 1, 5));
   }, []);
 
-  const handleNoClick = useCallback(() => {
-    if (phaseRef.current >= 5) {
-      setNoPopup(true);
-      setTimeout(() => {
-        setNoPopup(false);
-        gsap.to(noWrapperRef.current, { opacity: 0, duration: 0.3 });
-      }, 1500);
-    }
-  }, []);
-
   const handleYesClick = useCallback(() => {
-    // Confetti burst
     confetti({
       particleCount: 100,
       spread: 70,
@@ -181,7 +80,6 @@ export default function QuestionSection({ onYesClick }: QuestionSectionProps) {
       scalar: 1.2
     });
 
-    // Second burst
     setTimeout(() => {
       confetti({
         particleCount: 80,
@@ -205,49 +103,10 @@ export default function QuestionSection({ onYesClick }: QuestionSectionProps) {
     onYesClick();
   }, [onYesClick]);
 
-  // Flee algorithm for Phase 4
-  useEffect(() => {
-    if (phase !== 4) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!noWrapperRef.current || !noButtonRef.current) return;
-
-      const rect = noButtonRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const dx = e.clientX - centerX;
-      const dy = e.clientY - centerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < 200) {
-        const angle = Math.atan2(dy, dx) + Math.PI;
-        const moveDist = 100;
-        const newX = centerX + Math.cos(angle) * moveDist;
-        const newY = centerY + Math.sin(angle) * moveDist;
-        const clampedX = Math.max(60, Math.min(window.innerWidth - 60, newX));
-        const clampedY = Math.max(60, Math.min(window.innerHeight - 60, newY));
-
-        gsap.to(noWrapperRef.current, {
-          left: clampedX - rect.width / 2,
-          top: clampedY - rect.height / 2,
-          duration: 0.15,
-          ease: 'power2.out'
-        });
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [phase]);
-
-  const noButtonClasses = [
-    '',
-    'cursor-not-allowed',
-    'cursor-not-allowed',
-    'animate-shake cursor-not-allowed',
-    'cursor-not-allowed',
-    'cursor-not-allowed'
-  ][phase];
+  // Compute styles based on phase
+  const yesScale = [1, 1.05, 1.1, 1.15, 1.2, 1][phase];
+  const noScale = [1, 0.95, 0.85, 0.7, 0.5, 0][phase];
+  const noOpacity = [1, 1, 0.9, 0.7, 0.5, 0][phase];
 
   const yesButtonClasses = [
     '',
@@ -284,101 +143,72 @@ export default function QuestionSection({ onYesClick }: QuestionSectionProps) {
 
       {/* Buttons */}
       {showButtons && (
-        <div className="relative flex items-center justify-center gap-10">
+        <div className="flex flex-col items-center gap-6">
           {/* Yes Button */}
           <button
             ref={yesButtonRef}
             onClick={handleYesClick}
-            className={`relative font-handwritten font-bold rounded-xl transition-all duration-300 z-50 ${yesButtonClasses}`}
+            className={`relative font-handwritten font-bold rounded-xl transition-all duration-300 ${yesButtonClasses}`}
             style={{
-              width: phase >= 5 ? 'min(500px, 80vw)' : '180px',
-              height: phase >= 5 ? '100px' : '60px',
+              width: phase >= 5 ? 'min(500px, 85vw)' : 'min(220px, 60vw)',
+              height: phase >= 5 ? '80px' : '56px',
               backgroundColor: phase >= 2 ? '#D4607A' : '#E8A0B0',
               color: '#3D2C1D',
-              fontSize: phase >= 5 ? '48px' : '28px',
+              fontSize: phase >= 5 ? '36px' : '24px',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transform: `scale(${yesScale})`,
             }}
           >
             {yesText}
 
-            {/* Sparkles around Yes (Phase 3+) */}
-            <div
-              ref={sparklesRef}
-              className="absolute inset-0 pointer-events-none"
-              style={{ opacity: 0 }}
-            >
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute text-lg"
-                  style={{
-                    left: `${20 + i * 15}%`,
-                    top: `${-20 + (i % 2) * 10}px`,
-                    animation: `sparkle-float 1.5s infinite ease-in-out`,
-                    animationDelay: `${i * 0.3}s`
-                  }}
-                >
-                  ✨
-                </div>
-              ))}
-            </div>
-          </button>
-
-          {/* No Button Wrapper */}
-          <div
-            ref={noWrapperRef}
-            className="relative"
-            style={{ zIndex: 40 }}
-          >
-            {/* Sweat drop (Phase 2) */}
-            <div
-              ref={sweatRef}
-              className="absolute -top-6 left-1/2 -translate-x-1/2 text-xl"
-              style={{ opacity: 0 }}
-            >
-              💧
-            </div>
-
-            {/* Tear (Phase 4+) */}
-            <div
-              ref={tearRef}
-              className="absolute -top-8 left-1/2 -translate-x-1/2 text-2xl"
-              style={{ opacity: 0 }}
-            >
-              😢
-            </div>
-
-            {/* Popup for Phase 5 */}
-            {noPopup && (
-              <div
-                className="absolute -top-12 left-1/2 -translate-x-1/2 font-handwritten text-sm whitespace-nowrap px-3 py-1 rounded-lg"
-                style={{
-                  backgroundColor: '#3D2C1D',
-                  color: '#F5F0E6'
-                }}
-              >
-                You win...
+            {/* Sparkles (Phase 3+) */}
+            {phase >= 3 && (
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute text-base sm:text-lg"
+                    style={{
+                      left: `${20 + i * 15}%`,
+                      top: `${-16 + (i % 2) * 8}px`,
+                      animation: 'sparkle-float 1.5s infinite ease-in-out',
+                      animationDelay: `${i * 0.3}s`
+                    }}
+                  >
+                    ✨
+                  </div>
+                ))}
               </div>
             )}
+          </button>
 
+          {/* No Button */}
+          {noVisible && (
             <button
-              ref={noButtonRef}
-              onMouseEnter={handleNoHover}
               onClick={handleNoClick}
-              className={`font-handwritten rounded-lg transition-all duration-300 ${noButtonClasses}`}
+              className={`font-handwritten rounded-lg transition-all duration-300 ${phase >= 3 ? 'animate-shake' : ''}`}
               style={{
-                width: phase >= 5 ? '40px' : '100px',
-                height: phase >= 5 ? '30px' : '50px',
+                width: `${Math.max(50, 100 * noScale)}px`,
+                height: `${Math.max(28, 44 * noScale)}px`,
                 backgroundColor: '#9E9E9E',
                 color: 'white',
-                fontSize: phase >= 5 ? '14px' : '20px',
+                fontSize: `${Math.max(12, 18 * noScale)}px`,
                 border: 'none',
-                opacity: phase >= 3 ? 0.6 : 1
+                cursor: 'pointer',
+                opacity: noOpacity,
+                transform: `scale(${noScale})`,
               }}
             >
-              {noText}
+              {noTexts[phase]}
             </button>
+          )}
+
+          {/* Emoji reactions */}
+          <div className="h-8 flex items-center justify-center">
+            {phase === 2 && <span className="text-xl animate-gentle-bounce">💧</span>}
+            {phase === 3 && <span className="text-xl animate-gentle-bounce">🥺</span>}
+            {phase >= 4 && <span className="text-2xl animate-gentle-bounce">😢</span>}
           </div>
         </div>
       )}
